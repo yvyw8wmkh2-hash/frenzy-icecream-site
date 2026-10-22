@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { applyMigrations } = require('./migrations');
 
 const ROOT = __dirname;
 const DATA = path.join(ROOT, 'data');
@@ -107,6 +108,7 @@ CREATE TABLE IF NOT EXISTS orders (order_number TEXT PRIMARY KEY, created_at TIM
 CREATE INDEX IF NOT EXISTS orders_created_idx ON orders (created_at);
 CREATE TABLE IF NOT EXISTS messages (id TEXT PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), data JSONB NOT NULL);
 CREATE INDEX IF NOT EXISTS messages_created_idx ON messages (created_at);
+CREATE TABLE IF NOT EXISTS content_migrations (id TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now(), changes JSONB);
 CREATE TABLE IF NOT EXISTS uploads (id TEXT PRIMARY KEY, mime TEXT NOT NULL, size INT NOT NULL, data BYTEA NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
 `;
 const ORDER_LOCK_KEY = 72310001;               // pg_advisory_xact_lock key for order numbering
@@ -160,6 +162,18 @@ function pgStore(url, pgModule) {
           const seed = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
           await c.query('INSERT INTO site_config (id, data) VALUES (1, $1) ON CONFLICT (id) DO NOTHING', [seed]);
           console.log('[db] seeded site_config from data/config.json');
+        }
+        // one-time, additive content migrations (new products/photos) - see migrations.js
+        const done = new Set((await c.query('SELECT id FROM content_migrations')).rows.map(r => r.id));
+        const cur = (await c.query('SELECT data FROM site_config WHERE id = 1')).rows[0].data;
+        const { config, ran, changes } = applyMigrations(cur, done);
+        if (ran.length) {
+          if (changes.length) {
+            await c.query('INSERT INTO config_backups (data) VALUES ($1)', [cur]);
+            await c.query('UPDATE site_config SET data = $1, updated_at = now() WHERE id = 1', [config]);
+          }
+          for (const id of ran) await c.query('INSERT INTO content_migrations (id, changes) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING', [id, JSON.stringify(changes.filter(x => x.startsWith(id + ':')))]);
+          console.log(`[db] content migrations applied: ${ran.join(', ')} (${changes.length} changes)`);
         }
       });
     },

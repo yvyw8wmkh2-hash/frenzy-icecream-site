@@ -4,7 +4,7 @@
   "outputDirectory": "public",
   "functions": {
     "api/index.js": {
-      "includeFiles": "{public/**,admin/**,data/config.json}",
+      "includeFiles": "{public/**,admin/**,data/config.json,migrations.js}",
       "maxDuration": 30
     }
   },

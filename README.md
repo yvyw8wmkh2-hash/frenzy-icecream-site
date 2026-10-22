@@ -5,6 +5,8 @@ Plain HTML/CSS/JS front-end + a small Node.js server (`server.js`, Node 20+; 22 
 
 **Deploying for free on Render + Neon: see [DEPLOY.md](DEPLOY.md).**
 
+- New products (family tubs, ice lollies) reach the live database via `migrations.js`; see DEPLOY.md section 6.
+
 ## Run / restart
 ```bash
 cd /workspace/icecream-site

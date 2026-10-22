@@ -16,6 +16,7 @@
     const links = [['/', 'Home', 'home'], ['/menu.html', 'Menu', 'menu'], ['/contact.html', 'Contact', 'contact']];
     $('#site-header').innerHTML = `<div class="wrap nav">
       <a class="logo" href="/">${esc(CFG.brand.name)}<small>ICE CREAM · LAHORE</small></a>
+      <a class="btn small hdr-order" href="/order.html">Order</a>
       <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
       <nav class="nav-links">${links.map(([h, t, k]) => `<a href="${h}" class="${k === page ? 'active' : ''}">${t}</a>`).join('')}
       <a class="btn small" href="/order.html">Order now</a></nav></div>`;
@@ -29,48 +30,101 @@
     document.title = `${document.title} · ${CFG.brand.name}`;
   }
 
-  function featuredHTML() {
-    const f = items().filter(i => i.bestseller);
-    if (!f.length) return '';
-    return f.map(i => `<article class="feat">
-      <div class="ph"><img src="${esc(i.image || '/images/hero.jpg')}" alt="${esc(i.name)} ice cream" loading="lazy"></div>
-      <span class="ribbon">★ Fan favourite</span>
-      <div class="body"><h3 class="${f.indexOf(i) % 2 ? 'neon-cyan' : 'neon-pink'}">${esc(i.name)}</h3><p>${esc(i.description)}</p>
-      <div class="price">${money(i.price)} <span class="unit">/ ${esc(i.unit)}</span>${sampleBadge(i)}</div>
-      <div class="actions">${i.available ? `<a class="btn" href="/order.html?add=${encodeURIComponent(i.id)}">Order ${esc(i.name)}</a>` : '<span class="badge off">Sold out today</span>'}</div></div></article>`).join('');
+  // ---------- cart (kept in localStorage so "+ Add" on any page carries over to the order page) ----------
+  const CART_KEY = 'frenzy-cart-v1';
+  const cart = {
+    get() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch { return {}; } },
+    set(c) { try { localStorage.setItem(CART_KEY, JSON.stringify(c)); } catch {} },
+    qty(id) { return this.get()[id] || 0; },
+    change(id, d) {
+      const c = this.get(), max = CFG.ordering.maxQtyPerItem || 50;
+      const q = Math.min(max, Math.max(0, (c[id] || 0) + d)); if (q) c[id] = q; else delete c[id]; this.set(c); return q;
+    },
+    clear() { try { localStorage.removeItem(CART_KEY); } catch {} }
+  };
+  // srcset for the optimised product photos (/images/products/x.webp also exists as x-400.webp)
+  function imgTag(i, cls = '') {
+    const src = i.image || '/images/hero.jpg';
+    const m = src.match(/^\/images\/products\/([\w-]+)\.webp$/);
+    const set = m ? ` srcset="/images/products/${m[1]}-400.webp 400w, ${esc(src)} 720w" sizes="(max-width:720px) 46vw, (max-width:1000px) 31vw, 260px"` : '';
+    return `<img class="${cls}" src="${esc(src)}"${set} alt="${esc(i.name)}" loading="lazy" decoding="async" width="400" height="400">`;
   }
-  function itemCard(i) {
-    return `<article class="item ${i.available ? '' : 'unavailable'}">
-      <div class="ph"><img src="${esc(i.image || '/images/hero.jpg')}" alt="${esc(i.name)}" loading="lazy"></div>
-      <div class="body"><h4>${esc(i.name)} ${i.bestseller ? '<span class="badge hot">★</span>' : ''}</h4><p>${esc(i.description)}</p>
-      <div class="row"><span><span class="price">${money(i.price)}</span> <span class="unit">/ ${esc(i.unit)}</span>${sampleBadge(i)}</span>
-      ${i.available ? `<a class="btn small cyan" href="/order.html?add=${encodeURIComponent(i.id)}">+ Add</a>` : '<span class="badge off">Unavailable</span>'}</div></div></article>`;
+  function addControl(i) {
+    if (!i.available) return '<span class="badge off">Sold out</span>';
+    const q = cart.qty(i.id);
+    return q ? `<div class="stepper" role="group" aria-label="Quantity of ${esc(i.name)}"><button type="button" data-step="-1" aria-label="One less">−</button><span class="q">${q}</span><button type="button" data-step="1" aria-label="One more">+</button></div>`
+      : `<button type="button" class="btn add-btn" data-step="1">+ Add</button>`;
+  }
+  function productCard(i) {
+    return `<article class="pc ${i.available ? '' : 'unavailable'}" data-id="${esc(i.id)}">
+      <div class="ph">${imgTag(i)}<span class="size">${esc(i.unit)}</span>${i.bestseller ? '<span class="fav" title="Fan favourite">★</span>' : ''}</div>
+      <div class="pb"><h3>${esc(i.name)}</h3>${i.description ? `<p class="desc">${esc(i.description)}</p>` : ''}
+      <div class="price-row"><span class="price">${money(i.price)}</span><span class="per">/ ${esc(i.unit)}</span></div>
+      <div class="add" data-add="${esc(i.id)}">${addControl(i)}</div></div></article>`;
+  }
+  const slug = s => 'cat-' + String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  // All products grouped by category, with a sticky tab bar to jump between categories.
+  function renderProducts(root) {
+    const favs = items().filter(i => i.bestseller);
+    const cats = [...(favs.length ? [{ category: '★ Fan favourites', id: 'cat-favourites', items: favs }] : []),
+      // fan favourites get their own section, so they are not repeated in their category
+      ...CFG.menu.map(c => ({ ...c, id: slug(c.category), items: favs.length ? c.items.filter(i => !i.bestseller) : c.items })).filter(c => c.items.length)];
+    const short = c => c.category.replace(/\s*\(.*\)\s*$/, '') || c.category;
+    root.innerHTML = `<nav class="cat-tabs" aria-label="Menu categories"><div class="tabs-inner">${cats.map((c, n) => `<a href="#${c.id}" class="${n ? '' : 'active'}">${esc(short(c))}</a>`).join('')}</div></nav>
+      ${cats.map(c => `<section class="cat-sec" id="${c.id}"><div class="cat-head"><h2>${esc(c.category)}</h2><span class="count">${c.items.length} item${c.items.length === 1 ? '' : 's'}</span></div>
+      <div class="pgrid">${c.items.map(productCard).join('')}</div></section>`).join('')}`;
+    root.addEventListener('click', e => {
+      const b = e.target.closest('[data-step]'); if (!b) return;
+      const id = b.closest('[data-add]').dataset.add; cart.change(id, +b.dataset.step); refreshCart();
+    });
+    // highlight the tab of the section being viewed
+    const tabs = $$('.cat-tabs a', root), secs = cats.map(c => document.getElementById(c.id)), bar = $('.cat-tabs', root);
+    let ticking = false;
+    const onScroll = () => {
+      ticking = false;
+      const off = bar.getBoundingClientRect().bottom + 24;
+      let k = 0; secs.forEach((s, n) => { if (s.getBoundingClientRect().top <= off) k = n; });
+      tabs.forEach((t, n) => t.classList.toggle('active', n === k));
+      const t = tabs[k], inner = t.parentElement;
+      if (t.offsetLeft < inner.scrollLeft || t.offsetLeft + t.offsetWidth > inner.scrollLeft + inner.clientWidth) inner.scrollTo({ left: t.offsetLeft - 16, behavior: 'smooth' });
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    refreshCart();
+  }
+  function refreshCart() {
+    const c = cart.get(), all = Object.fromEntries(items().map(i => [i.id, i]));
+    $$('[data-add]').forEach(el => { const it = all[el.dataset.add]; if (it) el.innerHTML = addControl(it); });
+    let count = 0, sum = 0;
+    for (const [id, q] of Object.entries(c)) { const it = all[id]; if (it && it.available) { count += q; sum += q * it.price; } }
+    let bar = $('#cart-bar');
+    if (!bar) { document.body.insertAdjacentHTML('beforeend', '<div class="cart-bar hidden" id="cart-bar"></div>'); bar = $('#cart-bar'); }
+    bar.innerHTML = `<div><strong>${money(sum)}</strong><small>${count} item${count === 1 ? '' : 's'} in your order</small></div><a class="btn" href="/order.html">Checkout →</a>`;
+    bar.classList.toggle('hidden', !count); document.body.classList.toggle('has-cart', !!count);
   }
 
   // ---------- pages ----------
   const pages = {
     home() {
-      const b = CFG.brand;
-      $('#hero').innerHTML = `<img class="bg" src="${esc(b.heroImage || '/images/hero.jpg')}" alt="">
+      const b = CFG.brand, o = CFG.ordering;
+      $('#hero').innerHTML = `<img class="bg" src="${esc(b.heroImage || '/images/hero.jpg')}" alt="" fetchpriority="high">
         <div class="content"><h1 class="neon-pink">${esc(b.name)}</h1>
         ${b.urduTagline ? `<div class="urdu">${esc(b.urduTagline)}</div>` : ''}
         <p class="tag">${esc(b.tagline)}</p>
-        <div class="cta-row"><a class="btn big" href="/order.html">🍦 Order now</a><a class="btn big ghost" href="/menu.html">See the menu</a></div></div>`;
+        <div class="cta-row"><a class="btn" href="#products">🍦 Order now</a><a class="btn ghost" href="/menu.html">Full menu</a></div>
+        <ul class="pills"><li>🛵 Delivery in Lahore</li><li>💵 Cash on delivery</li><li>🏭 Made in Lahore</li></ul></div>`;
       $('#intro').textContent = b.intro;
-      $('#featured').innerHTML = featuredHTML();
-      const o = CFG.ordering;
       $('#delivery-info').textContent = `Delivery fee ${money(o.deliveryFee)}${o.freeDeliveryOver ? `, free over ${money(o.freeDeliveryOver)}` : ''}. ${o.deliveryAreaNote}`;
+      renderProducts($('#products'));
+      sampleNote();
     },
-    menu() {
-      $('#featured').innerHTML = featuredHTML();
-      $('#menu-list').innerHTML = CFG.menu.map(c => {
-        const rest = c.items.filter(i => !i.bestseller);
-        return rest.length ? `<h3 class="cat-title">${esc(c.category)}</h3><div class="grid">${rest.map(itemCard).join('')}</div>` : '';
-      }).join('');
-    },
+    menu() { renderProducts($('#products')); sampleNote(); },
     order() { orderPage(); },
     contact() { contactPage(); }
   };
+  function sampleNote() {
+    const el = $('#sample-note'); if (!el) return;
+    el.classList.toggle('hidden', !items().some(i => i.samplePrice));
+  }
 
   function karachiToday(offsetDays = 0) {
     return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + offsetDays * 864e5));
@@ -79,13 +133,21 @@
   function orderPage() {
     const o = CFG.ordering, max = o.maxQtyPerItem || 50;
     const preset = new URLSearchParams(location.search).get('add');
-    const all = items().filter(i => i.available).sort((a, b) => (b.bestseller | 0) - (a.bestseller | 0));
-    $('#items').innerHTML = all.map(i => `<div class="oi ${i.bestseller ? 'star' : ''}" data-id="${esc(i.id)}" data-price="${i.price}">
-      <img src="${esc(i.image || '/images/hero.jpg')}" alt="">
+    const all = Object.fromEntries(items().filter(i => i.available).map(i => [i.id, i]));
+    if (preset && all[preset] && !cart.qty(preset)) cart.change(preset, 1);
+    const saved = cart.get();
+    const row = i => `<div class="oi ${i.bestseller ? 'star' : ''} ${saved[i.id] ? '' : 'zero'}" data-id="${esc(i.id)}" data-price="${i.price}">
+      ${imgTag(i)}
       <div class="info"><strong>${i.bestseller ? '★ ' : ''}${esc(i.name)}</strong><small>${money(i.price)} / ${esc(i.unit)}${i.samplePrice ? ' · sample price' : ''}</small></div>
       <div class="qty"><button type="button" data-d="-1" aria-label="Less">−</button>
-      <input type="number" inputmode="numeric" min="0" max="${max}" value="${i.id === preset ? 1 : 0}" name="qty_${esc(i.id)}" aria-label="Quantity of ${esc(i.name)}">
-      <button type="button" data-d="1" aria-label="More">+</button></div></div>`).join('');
+      <input type="number" inputmode="numeric" min="0" max="${max}" value="${Math.min(max, saved[i.id] || 0)}" name="qty_${esc(i.id)}" aria-label="Quantity of ${esc(i.name)}">
+      <button type="button" data-d="1" aria-label="More">+</button></div></div>`;
+    $('#items').innerHTML = CFG.menu.map(c => { const av = c.items.filter(i => i.available); return av.length ? `<h3 class="oi-cat">${esc(c.category)}</h3>${av.map(row).join('')}` : ''; }).join('');
+    if (Object.keys(saved).some(id => all[id])) {        // came from "+ Add": show the picked items first, the rest on demand
+      $('#items').classList.add('collapsed');
+      $('#items').insertAdjacentHTML('afterend', '<button type="button" class="btn ghost small" id="show-all" style="margin-top:12px;width:100%">+ Add more items</button>');
+      $('#show-all').addEventListener('click', e => { $('#items').classList.remove('collapsed'); e.target.remove(); });
+    }
     const form = $('#order-form');
     const date = form.elements.date;
     date.min = karachiToday(); date.max = karachiToday(o.maxDaysAhead || 30); date.value = karachiToday();
@@ -95,11 +157,13 @@
     document.body.classList.add('has-bar');
 
     function calc() {
-      let sub = 0, count = 0; const lines = [];
+      let sub = 0, count = 0; const lines = [], cq = {};
       $$('.oi').forEach(r => {
         const inp = $('input', r); let q = parseInt(inp.value || '0', 10); if (isNaN(q) || q < 0) q = 0; if (q > max) q = max;
         if (q) { sub += q * +r.dataset.price; count += q; lines.push(`${q} × ${$('strong', r).textContent.replace('★ ', '')}`); }
+        cq[r.dataset.id] = q;
       });
+      const kept = cart.get(); for (const [id, q] of Object.entries(cq)) { if (q) kept[id] = q; else delete kept[id]; } cart.set(kept);
       const delivery = form.elements.fulfilment.value === 'delivery';
       const fee = delivery && sub > 0 ? (o.freeDeliveryOver && sub >= o.freeDeliveryOver ? 0 : o.deliveryFee || 0) : 0;
       $('#t-lines').innerHTML = lines.length ? lines.map(esc).join('<br>') : '<span style="color:var(--muted)">No items yet – tap + to add.</span>';
@@ -135,6 +199,7 @@
     });
   }
   function showConfirmation(x) {
+    cart.clear();
     document.body.classList.remove('has-bar');
     $('#order-area').innerHTML = `<section class="card glow" style="max-width:720px;margin:0 auto">
       <h1 class="neon-pink">Shukriya! Order placed 🎉</h1>

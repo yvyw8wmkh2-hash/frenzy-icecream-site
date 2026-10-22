@@ -59,6 +59,15 @@ function karachiDate(d = new Date()) { return new Intl.DateTimeFormat('en-CA', {
     for (const p of ['/menu', '/order', '/contact']) { r = await fetch(BASE + p); assert.equal(r.status, 200, p); }
     r = await fetch(BASE + '/no-such-page'); assert.equal(r.status, 404);
     ok('static pages and images 200, clean URLs 200, unknown page 404');
+    {
+      const c0 = await (await fetch(BASE + '/api/config')).json();
+      const ids = c0.menu.flatMap(c => c.items.map(i => i.id));
+      for (const id of ['chocolate-tub', 'kulfi-tub-1l', 'strawberry-tub-1l', 'chocolate-tub-5l', 'mango-tub-5l', 'kulfi-tub-5l', 'strawberry-tub-5l', 'mango-lolly', 'rooh-afza-lolly', 'choc-bar']) assert(ids.includes(id), 'missing product ' + id);
+      for (const n of ['tub-1l-chocolate', 'tub-5l-strawberry', 'lolly-mango', 'chocbar', 'kulfi-stick']) {
+        for (const f of [n, n + '-400']) { r = await fetch(`${BASE}/images/products/${f}.webp`); assert.equal(r.status, 200, f); assert.equal(r.headers.get('content-type'), 'image/webp'); }
+      }
+      ok('new tubs (1 L & 5 L), ice lollies and their WebP photos are served');
+    }
     r = await fetch(BASE + '/admin/'); assert.equal(r.status, 401); ok('admin requires auth (401)');
     r = await fetch(BASE + '/admin/', { headers: { Authorization: 'Basic ' + Buffer.from('admin:wrong').toString('base64') } }); assert.equal(r.status, 401);
     r = await fetch(BASE + '/admin/', { headers: { Authorization: AUTH } }); assert.equal(r.status, 200); assert.match(await r.text(), /<html/i);

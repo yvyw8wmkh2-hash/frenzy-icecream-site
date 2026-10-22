@@ -82,3 +82,17 @@ How it works on Vercel:
 - Pushing to `main` redeploys automatically. Pull requests get preview deployments, and **those use the same database** unless you set a different `DATABASE_URL` for Preview.
 
 Local check of the Vercel path: `DATABASE_URL=postgres://… npm run test:vercel`. This runs `api/index.js` with a pre-parsed body, the 4.5 MB limit and a read-only filesystem.
+
+## 6. Adding products to a live database (content migrations)
+The live menu lives in Postgres and is seeded from `data/config.json` only once, so editing that file alone does
+not change an existing site. New built-in products are added with **content migrations** in `migrations.js`:
+- they run automatically at startup (inside the same locked transaction as the schema/seed step),
+- each one runs once per database (recorded in table `content_migrations`, with the list of changes),
+- they only add missing items/categories and only update a field that still has its original seed value,
+  so prices/names/photos edited in `/admin`, orders, messages and uploads are never overwritten,
+- the previous config is saved to `config_backups` first.
+
+Migration `2026-10-22-tubs-and-lollies` added the 1 L / 5 L family tubs (chocolate, mango, kulfi, strawberry),
+the "Ice Lollies & Stick Bars" category and the new photos in `public/images/products/` (WebP, 720 px + 400 px;
+1024 px JPEG sources in `images-src/`). To add more products later: add a new entry to `MIGRATIONS`, then run
+`node migrations.js` to apply it to `data/config.json` as well (keeps fresh installs identical).

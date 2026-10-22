@@ -1,5 +1,5 @@
 {
-  "_README": "Edited automatically by the /admin content manager (recommended), or by hand. Items/prices marked SAMPLE are placeholders. 'bestseller': true = large 'Fan favourites' card. 'samplePrice': true shows a 'sample price' badge; switch it off once the price is real. Prices in PKR (Rs).",
+  "_README": "Edited automatically by the /admin content manager (recommended), or by hand. Items/prices marked SAMPLE are placeholders. 'bestseller': true = large 'Fan favourites' card. 'samplePrice': true shows a 'sample price' badge; switch it off once the price is real. Prices in PKR (Rs). New built-in products reach the live (Postgres) site through migrations.js, not by editing this file alone.",
   "brand": {
     "name": "Frenzy",
     "tagline": "Lahore's favourite ice cream (sample tagline)",
@@ -101,6 +101,159 @@
       ]
     },
     {
+      "category": "Family Tubs (1 L & 5 L)",
+      "items": [
+        {
+          "id": "chocolate-tub",
+          "name": "Chocolate Tub 1 L",
+          "description": "Rich chocolate ice cream loaded with chocolate chips.",
+          "unit": "1L tub",
+          "price": 900,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-1l-chocolate.webp"
+        },
+        {
+          "id": "mango-tub",
+          "name": "Mango Tub 1 L",
+          "description": "Made with Pakistani mangoes: sweet, fresh and fruity.",
+          "unit": "1L tub",
+          "price": 950,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-1l-mango.webp"
+        },
+        {
+          "id": "kulfi-tub-1l",
+          "name": "Kulfi Tub 1 L",
+          "description": "Creamy desi kulfi with pista, badam and kesar.",
+          "unit": "1L tub",
+          "price": 1000,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-1l-kulfi.webp"
+        },
+        {
+          "id": "strawberry-tub-1l",
+          "name": "Strawberry Tub 1 L",
+          "description": "Pink strawberry ice cream topped with fresh strawberries.",
+          "unit": "1L tub",
+          "price": 900,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-1l-strawberry.webp"
+        },
+        {
+          "id": "chocolate-tub-5l",
+          "name": "Chocolate Tub 5 L",
+          "description": "Party-size chocolate chip tub for big families and events.",
+          "unit": "5L tub",
+          "price": 3800,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-5l-chocolate.webp"
+        },
+        {
+          "id": "mango-tub-5l",
+          "name": "Mango Tub 5 L",
+          "description": "Party-size mango tub: perfect for weddings and dawats.",
+          "unit": "5L tub",
+          "price": 4000,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-5l-mango.webp"
+        },
+        {
+          "id": "kulfi-tub-5l",
+          "name": "Kulfi Tub 5 L",
+          "description": "Party-size kulfi tub with pista, badam and kesar.",
+          "unit": "5L tub",
+          "price": 4200,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-5l-kulfi.webp"
+        },
+        {
+          "id": "strawberry-tub-5l",
+          "name": "Strawberry Tub 5 L",
+          "description": "Party-size strawberry tub with real strawberry pieces.",
+          "unit": "5L tub",
+          "price": 3800,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/tub-5l-strawberry.webp"
+        },
+        {
+          "id": "vanilla-tub",
+          "name": "Vanilla Tub (sample)",
+          "description": "1 litre family pack.",
+          "unit": "1L tub",
+          "price": 950,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/tub.jpg"
+        },
+        {
+          "id": "tutti-frutti-tub",
+          "name": "Tutti Frutti Tub (sample)",
+          "description": "1 litre, colourful candied fruit.",
+          "unit": "1L tub",
+          "price": 1000,
+          "available": false,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/tub.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Ice Lollies & Stick Bars",
+      "items": [
+        {
+          "id": "mango-lolly",
+          "name": "Mango Ice Lolly",
+          "description": "Frozen mango-orange water ice on a stick. Super refreshing.",
+          "unit": "stick",
+          "price": 80,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/lolly-mango.webp"
+        },
+        {
+          "id": "rooh-afza-lolly",
+          "name": "Rooh Afza Strawberry Lolly",
+          "description": "Rose and strawberry water-ice gola on a stick.",
+          "unit": "stick",
+          "price": 100,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/lolly-rooh-afza.webp"
+        },
+        {
+          "id": "choc-bar",
+          "name": "Chocolate Bar (Choc Bar)",
+          "description": "Vanilla ice cream dipped in a crunchy chocolate shell.",
+          "unit": "stick",
+          "price": 150,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/products/chocbar.webp"
+        }
+      ]
+    },
+    {
       "category": "Kulfi & Desi Favourites",
       "items": [
         {
@@ -123,7 +276,7 @@
           "available": true,
           "bestseller": false,
           "samplePrice": true,
-          "image": "/images/kulfi.jpg"
+          "image": "/images/products/kulfi-stick.webp"
         },
         {
           "id": "kheer-ice-cream",
@@ -135,55 +288,6 @@
           "bestseller": false,
           "samplePrice": true,
           "image": "/images/vanilla.jpg"
-        }
-      ]
-    },
-    {
-      "category": "Family Tubs (1 Litre)",
-      "items": [
-        {
-          "id": "vanilla-tub",
-          "name": "Vanilla Tub (sample)",
-          "description": "1 litre family pack.",
-          "unit": "1L tub",
-          "price": 950,
-          "available": true,
-          "bestseller": false,
-          "samplePrice": true,
-          "image": "/images/tub.jpg"
-        },
-        {
-          "id": "chocolate-tub",
-          "name": "Chocolate Tub",
-          "description": "1 litre family pack.",
-          "unit": "1L tub",
-          "price": 1050,
-          "available": true,
-          "bestseller": false,
-          "samplePrice": true,
-          "image": "/images/chocolate.jpg"
-        },
-        {
-          "id": "mango-tub",
-          "name": "Mango Tub",
-          "description": "1 litre family pack, seasonal.",
-          "unit": "1L tub",
-          "price": 1100,
-          "available": true,
-          "bestseller": false,
-          "samplePrice": true,
-          "image": "/images/mango.jpg"
-        },
-        {
-          "id": "tutti-frutti-tub",
-          "name": "Tutti Frutti Tub (sample)",
-          "description": "1 litre, colourful candied fruit.",
-          "unit": "1L tub",
-          "price": 1000,
-          "available": false,
-          "bestseller": false,
-          "samplePrice": true,
-          "image": "/images/tub.jpg"
         }
       ]
     },
