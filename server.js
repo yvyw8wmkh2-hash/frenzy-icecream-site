@@ -1,5 +1,7 @@
-// Ice cream factory website – zero-dependency Node.js server (Node 18+).
+// Ice cream factory website – plain Node.js http server (Node 18+).
 // Run: npm start   (env: PORT, HOST, ADMIN_PASSWORD, DATABASE_URL – see README/DEPLOY.md)
+// The router is exported as `handler(req, res)` so it can also run as a Vercel serverless
+// function (api/index.js). listen() is only called when this file is run directly.
 'use strict';
 const http = require('http');
 const fs = require('fs');
@@ -15,6 +17,11 @@ const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, 'public');
 const store = createStore();
 const TZ = 'Asia/Karachi';
+const SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+// Vercel rejects request bodies over ~4.5 MB, so keep uploads well below that on every host.
+const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;                 // decoded image
+const MAX_UPLOAD_BODY = Math.ceil(MAX_UPLOAD_BYTES * 4 / 3) + 64 * 1024; // base64 JSON body
+const UPLOAD_TOO_LARGE = `Photo too large (max ${MAX_UPLOAD_BYTES / 1048576} MB). Please choose a smaller photo.`;
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp' };
@@ -31,18 +38,42 @@ function send(res, status, body, type = 'text/html; charset=utf-8', extra = {}) 
   res.end(body);
 }
 function sendJSON(res, status, obj) { send(res, status, JSON.stringify(obj), MIME['.json'], { 'Cache-Control': 'no-store' }); }
-function readBody(req, limit = 100 * 1024) {
+class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
+function tooLarge(limit) { return new HttpError(413, limit >= MAX_UPLOAD_BODY ? UPLOAD_TOO_LARGE : 'Request too large.'); }
+function readRaw(req, limit) {
+  if (req.readableEnded) return Promise.resolve('');   // stream already consumed (e.g. by a platform body parser)
   return new Promise((resolve, reject) => {
     let size = 0; const chunks = [];
-    req.on('data', c => { size += c.length; if (size > limit) { reject(new Error('Body too large')); req.destroy(); } else chunks.push(c); });
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('data', c => {
+      size += c.length;
+      if (size > limit * 2) { reject(tooLarge(limit)); req.destroy(); }   // abusive: stop reading
+      else if (size <= limit) chunks.push(c);                              // over limit: drain, then answer 413
+    });
+    req.on('end', () => size > limit ? reject(tooLarge(limit)) : resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
 }
+// Returns the request body as a string (read from the stream) or as an object/string that the
+// platform already parsed (Vercel's Node runtime exposes a pre-parsed `req.body`).
+async function readBody(req, limit = 100 * 1024) {
+  let pre;
+  try { pre = req.body; } catch { throw new HttpError(400, 'Invalid request body.'); }   // Vercel's getter throws on bad JSON
+  if (pre === undefined || pre === null) return readRaw(req, limit);
+  if (Buffer.isBuffer(pre)) pre = pre.toString('utf8');
+  const size = Buffer.byteLength(typeof pre === 'string' ? pre : JSON.stringify(pre));
+  if (size > limit) throw tooLarge(limit);
+  return pre;
+}
+async function readJSON(req, limit) {
+  const b = await readBody(req, limit);
+  if (typeof b !== 'string') return b || {};
+  try { return JSON.parse(b || '{}'); } catch { throw new HttpError(400, 'Invalid JSON.'); }
+}
 async function parseBody(req) {
-  const raw = await readBody(req);
   const ct = (req.headers['content-type'] || '').toLowerCase();
-  if (ct.includes('application/json')) return JSON.parse(raw || '{}');
+  if (ct.includes('application/json')) return readJSON(req);
+  const raw = await readBody(req);
+  if (typeof raw !== 'string') return raw || {};
   const p = new URLSearchParams(raw); const o = {};
   for (const [k, v] of p) { if (k in o) o[k] = [].concat(o[k], v); else o[k] = v; }
   return o;
@@ -179,7 +210,7 @@ function sniffImage(buf) {
 async function adminApi(req, res, sub, cfg) {
   const m = req.method;
   if (m !== 'GET' && !(req.headers['content-type'] || '').includes('application/json')) return sendJSON(res, 415, { ok: false, error: 'JSON required' }); // CSRF guard
-  const body = async (limit) => { const raw = await readBody(req, limit); return JSON.parse(raw || '{}'); };
+  const body = limit => readJSON(req, limit);
   try {
     if (sub === '/state' && m === 'GET') return sendJSON(res, 200, { config: cfg, orders: await store.listOrders(), messages: await store.listMessages(), statuses: ORDER_STATUSES, storage: store.mode });
     if (sub === '/config' && m === 'PUT') {
@@ -190,12 +221,12 @@ async function adminApi(req, res, sub, cfg) {
       return sendJSON(res, 200, { ok: true, config: clean });
     }
     if (sub === '/upload' && m === 'POST') {
-      const { data } = await body(12 * 1024 * 1024);
+      const { data } = await body(MAX_UPLOAD_BODY);
       const b64 = String(data || '').replace(/^data:[^,]*,/, '');
       const buf = Buffer.from(b64, 'base64');
       const ext = sniffImage(buf);
+      if (buf.length > MAX_UPLOAD_BYTES) return sendJSON(res, 413, { ok: false, error: UPLOAD_TOO_LARGE });
       if (!ext) return sendJSON(res, 400, { ok: false, error: 'Only JPG, PNG or WebP images are allowed.' });
-      if (buf.length > 8 * 1024 * 1024) return sendJSON(res, 400, { ok: false, error: 'Image too large (max 8 MB).' });
       const url = await store.saveUpload(buf, ext);
       console.log('[admin] uploaded', url);
       return sendJSON(res, 201, { ok: true, url });
@@ -228,7 +259,8 @@ async function adminApi(req, res, sub, cfg) {
     }
     return sendJSON(res, 404, { ok: false, error: 'Unknown admin endpoint' });
   } catch (e) {
-    return sendJSON(res, 400, { ok: false, error: e.message || 'Bad request' });
+    if (!e.status) console.error('[admin]', e.message);
+    return sendJSON(res, e.status || 400, { ok: false, error: e.message || 'Bad request' });
   }
 }
 
@@ -238,10 +270,14 @@ async function handle(req, res) {
   const p = decodeURIComponent(url.pathname);
   // health checks: no DB round-trip by default (keeps Neon free compute asleep); /healthz?db=1 also pings the DB
   if (p === '/healthz') {
-    if (url.searchParams.get('db') !== '1') return sendJSON(res, 200, { ok: true, storage: store.mode });
-    try { await store.ping(); return sendJSON(res, 200, { ok: true, storage: store.mode, db: 'up' }); }
+    const info = { ok: true, storage: store.mode, ...(SERVERLESS ? { serverless: true } : {}),
+      ...(SERVERLESS && store.mode === 'file' ? { warning: 'DATABASE_URL is not set: the serverless filesystem is read-only, so orders, messages and edits cannot be saved.' } : {}) };
+    if (url.searchParams.get('db') !== '1') return sendJSON(res, 200, info);
+    try { await ready(); await store.ping(); return sendJSON(res, 200, { ...info, db: 'up' }); }
     catch (e) { return sendJSON(res, 503, { ok: false, storage: store.mode, db: 'down', error: e.message }); }
   }
+  // lazy, idempotent storage init (schema + seed) on the first request that needs it
+  try { await ready(); } catch (e) { console.error('[storage]', e.message); return send(res, 503, 'The site is starting up, please try again in a moment.', 'text/plain', { 'Retry-After': '5' }); }
   let mm;
   if ((req.method === 'GET' || req.method === 'HEAD') && (mm = p.match(/^\/uploads\/([\w-]+\.(?:jpe?g|png|webp))$/i))) {
     const up = await store.getUpload(mm[1]);
@@ -249,7 +285,9 @@ async function handle(req, res) {
     return send(res, 200, req.method === 'HEAD' ? '' : up.data, up.mime, { 'Cache-Control': 'public, max-age=31536000, immutable', 'Content-Length': up.data.length });
   }
   let cfg;
-  try { cfg = await store.getConfig(); } catch (e) { console.error('[config]', e.message); return send(res, 500, 'Site configuration could not be loaded.', 'text/plain'); }
+  const isAdmin = p === '/admin' || p.startsWith('/admin/');
+  // admin always reads fresh config (several serverless instances may each hold a cached copy)
+  try { cfg = await store.getConfig({ fresh: isAdmin }); } catch (e) { console.error('[config]', e.message); return send(res, 500, 'Site configuration could not be loaded.', 'text/plain'); }
 
   if (p === '/api/config' && req.method === 'GET') {
     const { _README, ...pub } = cfg; return sendJSON(res, 200, pub);
@@ -257,7 +295,7 @@ async function handle(req, res) {
   if (p === '/api/health') return sendJSON(res, 200, { ok: true });
 
   if ((p === '/api/order' || p === '/order') && req.method === 'POST') {
-    let input; try { input = await parseBody(req); } catch { return sendJSON(res, 400, { ok: false, errors: { form: 'Invalid request.' } }); }
+    let input; try { input = await parseBody(req); } catch (e) { return sendJSON(res, e.status || 400, { ok: false, errors: { form: e.status === 413 ? e.message : 'Invalid request.' } }); }
     if (str(input.website, 100)) return sendJSON(res, 400, { ok: false, errors: { form: 'Rejected.' } }); // honeypot
     const { errors, order } = validateOrder(input, cfg);
     if (Object.keys(errors).length) return wantsJSON(req) ? sendJSON(res, 422, { ok: false, errors }) : send(res, 422, errorPage(cfg, errors));
@@ -267,7 +305,7 @@ async function handle(req, res) {
   }
 
   if ((p === '/api/contact' || p === '/contact') && req.method === 'POST') {
-    let input; try { input = await parseBody(req); } catch { return sendJSON(res, 400, { ok: false, errors: { form: 'Invalid request.' } }); }
+    let input; try { input = await parseBody(req); } catch (e) { return sendJSON(res, e.status || 400, { ok: false, errors: { form: e.status === 413 ? e.message : 'Invalid request.' } }); }
     if (str(input.website, 100)) return sendJSON(res, 400, { ok: false, errors: { form: 'Rejected.' } });
     const msg = { name: str(input.name, 80), phone: str(input.phone, 25), email: str(input.email, 120), message: str(input.message, 2000) };
     const errors = {};
@@ -282,7 +320,8 @@ async function handle(req, res) {
       : send(res, 201, shell(cfg, 'Message sent', `<section class="card confirm"><h1>Thanks, ${esc(saved.name)}!</h1><p>We received your message and will get back to you soon.</p><p><a class="btn" href="/">Home</a></p></section>`));
   }
 
-  if (p === '/admin' || p.startsWith('/admin/')) {
+  if (isAdmin) {
+    if (SERVERLESS && !process.env.ADMIN_PASSWORD) return send(res, 503, 'Admin is disabled until ADMIN_PASSWORD is set in the hosting environment.', 'text/plain');
     if (!checkAuth(req)) return send(res, 401, 'Authentication required', 'text/plain', { 'WWW-Authenticate': 'Basic realm="Frenzy admin", charset="UTF-8"' });
     if (p === '/admin') return send(res, 302, '', 'text/plain', { Location: '/admin/' });
     if (p.startsWith('/admin/api/')) return adminApi(req, res, p.slice(10), cfg);
@@ -307,24 +346,39 @@ async function handle(req, res) {
   });
 }
 
-const server = http.createServer((req, res) => {
-  handle(req, res).catch(e => { console.error(e); if (!res.headersSent) send(res, 500, 'Server error', 'text/plain'); });
-});
-async function initStore(tries = 5) {         // retry: a sleeping Neon compute can take a few seconds to wake
+// ---------- storage init (lazy, memoised, retried on the next request if it fails) ----------
+let readyPromise = null;
+async function initStore(tries) {              // retry: a sleeping Neon compute can take a few seconds to wake
   for (let i = 1; ; i++) {
     try { return await store.init(); }
-    catch (e) { if (i >= tries) throw e; console.error(`[startup] storage init failed (${e.message}), retry ${i}/${tries - 1} in 3s`); await new Promise(r => setTimeout(r, 3000)); }
+    catch (e) { if (i >= tries) throw e; console.error(`[storage] init failed (${e.message}), retry ${i}/${tries - 1} in 2s`); await new Promise(r => setTimeout(r, 2000)); }
   }
 }
-initStore(store.mode === 'postgres' ? 5 : 1).then(() => {
-  server.listen(PORT, HOST, () => {
-    console.log(`Ice cream site on http://${HOST}:${PORT}  (storage: ${store.mode}; admin: /admin, user "${ADMIN_USER}")`);
-    if (!process.env.ADMIN_PASSWORD) console.log('WARNING: using default admin password – set ADMIN_PASSWORD.');
+function ready() {
+  if (!readyPromise) readyPromise = initStore(store.mode === 'postgres' ? (SERVERLESS ? 2 : 5) : 1).catch(e => { readyPromise = null; throw e; });
+  return readyPromise;
+}
+
+// ---------- exported handler (used by server.listen below and by api/index.js on Vercel) ----------
+function handler(req, res) {
+  return handle(req, res).catch(e => { console.error(e); if (!res.headersSent) send(res, 500, 'Server error', 'text/plain'); else res.end(); });
+}
+module.exports = { handler, store, ready };
+
+if (require.main === module) {
+  const server = http.createServer(handler);
+  ready().then(() => {
+    server.listen(PORT, HOST, () => {
+      console.log(`Ice cream site on http://${HOST}:${PORT}  (storage: ${store.mode}; admin: /admin, user "${ADMIN_USER}")`);
+      if (!process.env.ADMIN_PASSWORD) console.log('WARNING: using default admin password – set ADMIN_PASSWORD.');
+    });
+  }).catch(e => { console.error('[startup] storage init failed:', e.message); process.exit(1); });
+  for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
+    console.log(`[shutdown] ${sig}`);
+    server.close(() => store.close().finally(() => process.exit(0)));
+    server.closeIdleConnections();
+    setTimeout(() => process.exit(0), 8000).unref();
   });
-}).catch(e => { console.error('[startup] storage init failed:', e.message); process.exit(1); });
-for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
-  console.log(`[shutdown] ${sig}`);
-  server.close(() => store.close().finally(() => process.exit(0)));
-  server.closeIdleConnections();
-  setTimeout(() => process.exit(0), 8000).unref();
-});
+} else if (!process.env.ADMIN_PASSWORD) {
+  console.log('WARNING: ADMIN_PASSWORD is not set – the admin panel uses the default password.');
+}

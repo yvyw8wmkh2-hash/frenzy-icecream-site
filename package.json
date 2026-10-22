@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node test/smoke.js"
+    "test": "node test/smoke.js",
+    "test:vercel": "node test/smoke.js --vercel"
   },
   "engines": {
     "node": "22.x"

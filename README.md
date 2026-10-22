@@ -53,7 +53,7 @@ Payment is **cash on delivery or pickup only**. There is no online payment.
 
 ## Permanent hosting
 This box and the temporary tunnel URL are not permanent. To go live:
-- **Free option (ready to use): Render free web service + Neon free Postgres.** Follow [DEPLOY.md](DEPLOY.md).
+- **Free options (ready to use): Vercel Hobby or Render free web service, each with Neon free Postgres.** Follow [DEPLOY.md](DEPLOY.md).
 - Or a small VPS (`npm start` behind HTTPS) with `data/` on a persistent disk.
 - Static-only hosts like **Netlify** or GitHub Pages can serve the pages, but orders and the admin need a backend (or a form service).
 - Buy a domain (e.g. `frenzy.pk` via PKNIC or any registrar) and point it at the host. Set a strong `ADMIN_PASSWORD`.
@@ -64,7 +64,10 @@ This box and the temporary tunnel URL are not permanent. To go live:
 server.js            Node server (static files, order/contact API, admin API, /healthz, /uploads/:id)
 store.js             storage layer: JSON files (local) or Postgres (when DATABASE_URL is set)
 render.yaml          Render Blueprint (free web service)
-test/smoke.js        end-to-end test (npm test)
+api/index.js         Vercel serverless entry (uses the handler exported by server.js)
+vercel.json          Vercel config: static public/, every other path rewritten to api/index
+test/smoke.js        end-to-end test (npm test; npm run test:vercel with DATABASE_URL)
+test/vercel-harness.js  local stand-in for Vercel's Node runtime used by test:vercel
 start.sh / tunnel.sh restart server / start a public tunnel
 data/config.json     ← all editable content (or use /admin)
 public/              index.html, menu.html, order.html, contact.html, css/, js/app.js, images/

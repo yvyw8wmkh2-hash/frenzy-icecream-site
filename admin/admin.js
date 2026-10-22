@@ -8,7 +8,7 @@
 
   async function api(path, method = 'GET', body) {
     const r = await fetch('/admin/api' + path, { method, headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: body ? JSON.stringify(body) : undefined, cache: 'no-store' });
-    const j = await r.json().catch(() => ({ ok: false, error: 'Server error' }));
+    const j = await r.json().catch(() => ({ ok: false, error: r.status === 413 ? 'Photo too large. Please choose a smaller photo.' : 'Server error' }));
     if (!r.ok && j.ok !== false) j.ok = false;
     return j;
   }
@@ -142,8 +142,12 @@
       }; img.onerror = () => rej(new Error('Not an image')); img.src = URL.createObjectURL(file);
     });
   }
+  const MAX_UPLOAD_CHARS = 4 * 1024 * 1024;   // ≈3 MB image as base64; the server (and Vercel's 4.5 MB request limit) rejects more
   async function uploadImage(file, max) {
-    try { flash('Uploading photo…'); const data = await resize(file, max); const j = await api('/upload', 'POST', { data });
+    try { flash('Uploading photo…'); let data = await resize(file, max);
+      if (data.length > MAX_UPLOAD_CHARS) data = await resize(file, Math.round(max * 0.6));   // try smaller before giving up
+      if (data.length > MAX_UPLOAD_CHARS) { flash('That photo is too large even after resizing (max 3 MB). Please choose a smaller photo.', false); return null; }
+      const j = await api('/upload', 'POST', { data });
       if (!j.ok) { flash(j.error || 'Upload failed', false); return null; } return j.url;
     } catch (e) { flash('That file could not be read as an image.', false); return null; }
   }
