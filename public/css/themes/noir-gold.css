@@ -1,0 +1,15 @@
+/* Theme 1 – Noir & Gold: deep charcoal, champagne-gold accents, cream text. Cormorant Garamond + Inter. */
+html[data-theme="noir-gold"]{
+  --bg:#0b0a09; --bg2:#080707; --card:#131210; --line:rgba(232,220,196,.10); --line-strong:rgba(232,220,196,.24);
+  --text:#efe7d6; --muted:#a39a89; --accent:#cdb27c; --accent-ink:#14110b; --accent-soft:rgba(205,178,124,.10); --price:#d9c08f;
+  --serif:"Cormorant Garamond",Georgia,serif; --sans:"Inter",system-ui,sans-serif; --serif-weight:500; --name-size:1.22rem; --name-weight:600;
+  --img-bg:#000; --hdr-bg:rgba(11,10,9,.96); --hero-fade:rgba(11,10,9,.96); --hero-mid:rgba(11,10,9,.45);
+  --r:4px; --btn-r:2px; --input-bg:#0f0e0c; --foot-bg:#070606;
+}
+html[data-theme="noir-gold"] .hero h1{font-weight:400;font-style:italic;font-size:clamp(3.6rem,9vw,5.4rem);letter-spacing:.01em}
+html[data-theme="noir-gold"] .section-title h2,html[data-theme="noir-gold"] .cat-head h2{font-weight:500}
+html[data-theme="noir-gold"] .logo{font-size:1.75rem;font-weight:600}
+@media (max-width:720px){
+  html[data-theme="noir-gold"] .pills li{font-size:.55rem;letter-spacing:.06em}
+  html[data-theme="noir-gold"] .pills li+li::before{margin:0 .4em}
+}

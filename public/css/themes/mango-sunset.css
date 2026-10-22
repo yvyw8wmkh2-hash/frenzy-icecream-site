@@ -1,0 +1,18 @@
+/* Theme 4 – Mango Sunset: deep plum-black with one mango-saffron accent; subtle and modern. Fraunces + Manrope. */
+html[data-theme="mango-sunset"]{
+  --bg:#120c13; --bg2:#0d080e; --card:#1b131c; --line:rgba(244,228,214,.09); --line-strong:rgba(244,228,214,.22);
+  --text:#f4ece4; --muted:#a5959f; --accent:#f2a93b; --accent-ink:#1a0f06; --accent-soft:rgba(242,169,59,.11); --price:#f4ece4;
+  --serif:"Fraunces",Georgia,serif; --sans:"Manrope",system-ui,sans-serif; --serif-weight:400; --name-size:1.02rem; --name-weight:450;
+  --img-bg:#000; --hdr-bg:rgba(18,12,19,.96); --hero-fade:rgba(18,12,19,.96); --hero-mid:rgba(18,12,19,.42);
+  --r:12px; --btn-r:10px; --input-bg:#170f18; --foot-bg:#0d080e;
+}
+html[data-theme="mango-sunset"] h1,html[data-theme="mango-sunset"] h2,html[data-theme="mango-sunset"] h3{font-variation-settings:"opsz" 96,"SOFT" 50,"WONK" 0}
+html[data-theme="mango-sunset"] .pc h3{font-variation-settings:"opsz" 24,"SOFT" 50}
+html[data-theme="mango-sunset"] .hero h1{font-weight:300;letter-spacing:-.02em}
+html[data-theme="mango-sunset"] .hero h1::after{content:".";color:var(--accent)}
+html[data-theme="mango-sunset"] .pc .price{color:var(--text)}
+html[data-theme="mango-sunset"] .btn{letter-spacing:.06em;text-transform:none;font-size:.88rem;font-weight:600}
+html[data-theme="mango-sunset"] .btn.small{font-size:.78rem;letter-spacing:.03em}
+html[data-theme="mango-sunset"] .add-btn{text-transform:none;letter-spacing:.03em;font-size:.82rem}
+html[data-theme="mango-sunset"] .cat-tabs a{text-transform:none;letter-spacing:.01em;font-size:.88rem}
+html[data-theme="mango-sunset"] .section-title h2,html[data-theme="mango-sunset"] .cat-head h2{font-weight:350}

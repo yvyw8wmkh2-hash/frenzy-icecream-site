@@ -24,7 +24,9 @@ const MAX_UPLOAD_BODY = Math.ceil(MAX_UPLOAD_BYTES * 4 / 3) + 64 * 1024; // base
 const UPLOAD_TOO_LARGE = `Photo too large (max ${MAX_UPLOAD_BYTES / 1048576} MB). Please choose a smaller photo.`;
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp' };
+  '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp', '.woff2': 'font/woff2' };
+// Optional site-wide default theme (noir-gold | chocolate-cream | ivory-parlour | mango-sunset | neon); see public/js/theme.js
+const SITE_THEME = /^[a-z-]{1,30}$/.test(process.env.SITE_THEME || '') ? process.env.SITE_THEME : 'noir-gold';
 
 function karachiDate(d = new Date()) {          // YYYY-MM-DD in Karachi
   return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
@@ -342,7 +344,9 @@ async function handle(req, res) {
   if (!full.startsWith(PUBLIC + path.sep)) return send(res, 403, 'Forbidden', 'text/plain');
   fs.readFile(full, (err, buf) => {
     if (err) return send(res, 404, shell(cfg, 'Not found', '<section class="card"><h1>Oops, this scoop melted 🫠</h1><p>Page not found. <a href="/">Go home</a></p></section>'));
-    send(res, 200, req.method === 'HEAD' ? '' : buf, MIME[path.extname(full)] || 'application/octet-stream', { 'Cache-Control': 'no-cache' });
+    if (SITE_THEME && full.endsWith('.html')) buf = Buffer.from(buf.toString('utf8').replace('<html lang="en">', `<html lang="en" data-default-theme="${SITE_THEME}">`));
+    const long = /\.(woff2)$/.test(full) ? { 'Cache-Control': 'public, max-age=31536000, immutable' } : { 'Cache-Control': 'no-cache' };
+    send(res, 200, req.method === 'HEAD' ? '' : buf, MIME[path.extname(full)] || 'application/octet-stream', long);
   });
 }
 

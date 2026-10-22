@@ -23,9 +23,9 @@
     const t = $('.menu-toggle'), n = $('.nav-links');
     t.addEventListener('click', () => { n.classList.toggle('open'); t.setAttribute('aria-expanded', n.classList.contains('open')); });
     const c = CFG.contact;
-    $('#site-footer').innerHTML = `<div class="wrap"><div><strong class="neon-pink" style="font-size:1.3rem">${esc(CFG.brand.name)}</strong><br>${esc(c.address)}</div>
-      <div>📞 <a href="${telHref(c.phone)}">${esc(c.phone)}</a><br>✉️ <a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>
-      <div>💵 ${esc(CFG.ordering.paymentNote)}<br><small>${esc(CFG.brand.imagesNote || '')}</small></div></div>`;
+    $('#site-footer').innerHTML = `<div class="wrap"><div><strong class="neon-pink foot-brand" style="font-size:1.3rem">${esc(CFG.brand.name)}</strong><br>${esc(c.address)}</div>
+      <div><span class="ico">📞</span> <a href="${telHref(c.phone)}">${esc(c.phone)}</a><br><span class="ico">✉️</span> <a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>
+      <div><span class="ico">💵</span> ${esc(CFG.ordering.paymentNote)}<br><small>${esc(CFG.brand.imagesNote || '')}</small></div></div>`;
     if (c.whatsapp) document.body.insertAdjacentHTML('beforeend', `<a class="wa-float" href="${waHref(c.whatsapp)}" target="_blank" rel="noopener" aria-label="WhatsApp us">💬</a>`);
     document.title = `${document.title} · ${CFG.brand.name}`;
   }
@@ -110,8 +110,8 @@
         <div class="content"><h1 class="neon-pink">${esc(b.name)}</h1>
         ${b.urduTagline ? `<div class="urdu">${esc(b.urduTagline)}</div>` : ''}
         <p class="tag">${esc(b.tagline)}</p>
-        <div class="cta-row"><a class="btn" href="#products">🍦 Order now</a><a class="btn ghost" href="/menu.html">Full menu</a></div>
-        <ul class="pills"><li>🛵 Delivery in Lahore</li><li>💵 Cash on delivery</li><li>🏭 Made in Lahore</li></ul></div>`;
+        <div class="cta-row"><a class="btn" href="#products"><span class="ico">🍦</span> Order now</a><a class="btn ghost" href="/menu.html">Full menu</a></div>
+        <ul class="pills"><li><span class="ico">🛵</span> Delivery in Lahore</li><li><span class="ico">💵</span> Cash on delivery</li><li><span class="ico">🏭</span> Made in Lahore</li></ul></div>`;
       $('#intro').textContent = b.intro;
       $('#delivery-info').textContent = `Delivery fee ${money(o.deliveryFee)}${o.freeDeliveryOver ? `, free over ${money(o.freeDeliveryOver)}` : ''}. ${o.deliveryAreaNote}`;
       renderProducts($('#products'));

@@ -1,0 +1,186 @@
+/* ==========================================================================
+   Frenzy premium theme base – shared structure for the calm/premium themes.
+   Loaded after style.css (by /js/theme.js) together with ONE colour file
+   (noir-gold.css, chocolate-cream.css, ivory-parlour.css, mango-sunset.css)
+   which only sets the variables below. Everything is scoped to html[data-theme].
+   ========================================================================== */
+@font-face{font-family:"Cormorant Garamond";src:url(/fonts/cormorant-garamond.woff2) format("woff2");font-weight:300 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Cormorant Garamond";src:url(/fonts/cormorant-garamond-italic.woff2) format("woff2");font-weight:300 700;font-style:italic;font-display:swap}
+@font-face{font-family:"Playfair Display";src:url(/fonts/playfair-display.woff2) format("woff2");font-weight:400 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Playfair Display";src:url(/fonts/playfair-display-italic.woff2) format("woff2");font-weight:400 900;font-style:italic;font-display:swap}
+@font-face{font-family:"DM Serif Display";src:url(/fonts/dm-serif-display.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Serif Display";src:url(/fonts/dm-serif-display-italic.woff2) format("woff2");font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:"Fraunces";src:url(/fonts/fraunces.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Fraunces";src:url(/fonts/fraunces-italic.woff2) format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Inter";src:url(/fonts/inter.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Sans";src:url(/fonts/dm-sans.woff2) format("woff2");font-weight:100 1000;font-style:normal;font-display:swap}
+@font-face{font-family:"Manrope";src:url(/fonts/manrope.woff2) format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Jost";src:url(/fonts/jost.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+
+html[data-theme]{
+  /* defaults (each theme file overrides these) */
+  --serif:"Playfair Display",Georgia,serif; --sans:"Inter",system-ui,sans-serif;
+  --serif-weight:500; --title-track:0; --name-size:1.02rem; --name-weight:500;
+  --accent-ink:#111; --accent-soft:rgba(255,255,255,.06); --price:var(--text);
+  --img-bg:#000; --hdr-bg:rgba(0,0,0,.82); --input-bg:rgba(255,255,255,.03);
+  --hero-fade:rgba(0,0,0,.9); --hero-mid:rgba(0,0,0,.35); --shadow:0 14px 34px -18px rgba(0,0,0,.7);
+  --card-border:var(--line); --r:14px; --btn-r:999px;
+  /* map the legacy neon colours onto the theme so every leftover rule stays on-palette */
+  --pink:var(--accent); --cyan:var(--accent); --lime:var(--price); --purple:var(--accent); --mango:var(--accent); --radius:var(--r);
+}
+html[data-theme] body{font-family:var(--sans);background:var(--bg);background-image:none;color:var(--text);font-size:15.5px;line-height:1.6;letter-spacing:.005em;font-feature-settings:"kern","liga"}
+html[data-theme] a{color:var(--accent)}
+html[data-theme] h1,html[data-theme] h2,html[data-theme] h3,html[data-theme] .logo{font-family:var(--serif);font-weight:var(--serif-weight);letter-spacing:var(--title-track);font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1}
+html[data-theme] .neon-pink,html[data-theme] .neon-cyan,html[data-theme] .neon-lime{color:var(--text);text-shadow:none}
+html[data-theme] .ico{display:none}
+html[data-theme] ::selection{background:var(--accent);color:var(--accent-ink)}
+
+/* ---------- header ---------- */
+html[data-theme] .site-header{background:var(--hdr-bg);border-bottom:1px solid var(--line);backdrop-filter:saturate(1.2) blur(12px)}
+html[data-theme] .nav{min-height:64px}
+html[data-theme] .logo{font-family:var(--serif);font-weight:var(--serif-weight);font-size:1.6rem;letter-spacing:.01em;color:var(--text);text-shadow:none;line-height:1}
+html[data-theme] .logo small{font-family:var(--sans);font-size:.56rem;font-weight:500;letter-spacing:.32em;color:var(--muted);text-shadow:none;margin-top:5px}
+html[data-theme] .nav-links a{font-weight:500;font-size:.92rem;letter-spacing:.02em;color:var(--text)}
+html[data-theme] .nav-links a:hover,html[data-theme] .nav-links a.active{color:var(--accent);background:transparent}
+html[data-theme] .menu-toggle{border:1px solid var(--line);color:var(--text);border-radius:999px;font-size:1.05rem;width:40px;height:40px;padding:0}
+
+/* ---------- buttons: slim, refined, no glow ---------- */
+html[data-theme] .btn{background:var(--accent);color:var(--accent-ink);box-shadow:none;border:1px solid var(--accent);border-radius:var(--btn-r);
+  font-family:var(--sans);font-weight:600;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;padding:12px 24px;min-height:44px;transition:background .2s,color .2s,border-color .2s,transform .2s}
+html[data-theme] .btn:hover{transform:none;box-shadow:none;filter:brightness(1.06)}
+html[data-theme] .btn.ghost,html[data-theme] .btn.cyan,html[data-theme] .btn.lime{background:transparent;color:var(--text);border:1px solid var(--line-strong,var(--line));box-shadow:none}
+html[data-theme] .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+html[data-theme] .btn.big{font-size:.86rem;padding:15px 34px;min-height:50px}
+html[data-theme] .btn.small{font-size:.72rem;padding:7px 14px;min-height:34px;letter-spacing:.14em}
+html[data-theme] .nav-links a.btn{color:var(--accent-ink)}
+html[data-theme] .hdr-order{background:transparent;color:var(--accent);border-color:var(--accent)}
+
+/* ---------- hero ---------- */
+html[data-theme] .hero{border:0;box-shadow:none;border-radius:var(--r);min-height:380px}
+html[data-theme] .hero::after{background:linear-gradient(90deg,var(--hero-fade) 0%,var(--hero-mid) 55%,transparent 100%)}
+html[data-theme] .hero .content{padding:44px 48px;min-width:0;width:100%}
+html[data-theme] .hero h1{font-family:var(--serif);font-weight:var(--serif-weight);font-size:clamp(3rem,7vw,4.6rem);letter-spacing:var(--title-track);color:var(--hero-text,var(--text));line-height:1}
+html[data-theme] .hero .urdu{color:var(--accent);text-shadow:none;font-size:1.1rem;margin-top:10px;opacity:.95}
+html[data-theme] .hero .tag{color:var(--hero-text,var(--text));opacity:.86;font-size:1.02rem;font-weight:400;margin-top:8px}
+html[data-theme] .hero .cta-row{gap:10px;margin-top:22px}
+html[data-theme] .hero .btn.ghost{color:var(--hero-text,var(--text));border-color:var(--hero-line,var(--line-strong,var(--line)))}
+html[data-theme] .pills{gap:0;margin-top:20px}
+html[data-theme] .pills li{background:none;border:0;padding:0;border-radius:0;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--hero-text,var(--text));opacity:.72}
+html[data-theme] .pills li+li::before{content:"·";margin:0 .7em;opacity:.8}
+
+/* ---------- section titles, notes ---------- */
+html[data-theme] .section-title{margin:56px 0 8px;align-items:baseline}
+html[data-theme] .section-title h2{font-size:clamp(1.75rem,4.6vw,2.4rem);color:var(--text)}
+html[data-theme] .link-more{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+html[data-theme] .hint{color:var(--muted);font-size:.9rem}
+html[data-theme] .hint b{color:var(--text);font-weight:600}
+html[data-theme] .sample-note{background:none;border:0;border-left:1px solid var(--accent);border-radius:0;color:var(--muted);padding:2px 0 2px 12px;font-size:.82rem;font-style:italic}
+html[data-theme] .sample-note b{color:var(--text);font-weight:600}
+html[data-theme] .page-head h1{font-size:clamp(2.2rem,7vw,3.2rem)}
+
+/* ---------- category tabs: quiet text tabs with an underline ---------- */
+html[data-theme] .cat-tabs{background:var(--bg);backdrop-filter:none;border-bottom:1px solid var(--line);padding:0}
+html[data-theme] .tabs-inner{gap:22px}
+html[data-theme] .cat-tabs a{background:none;border:0;border-radius:0;padding:15px 0 13px;font-weight:500;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid transparent;margin-bottom:-1px}
+html[data-theme] .cat-tabs a.active{background:none;color:var(--text);box-shadow:none;border-bottom-color:var(--accent)}
+html[data-theme] .cat-sec{padding-top:34px}
+html[data-theme] .cat-head{margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+html[data-theme] .cat-head h2{font-size:clamp(1.45rem,4vw,1.85rem);color:var(--text);text-shadow:none}
+html[data-theme] .cat-head .count{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- product cards: equal height, quiet, photo-first ---------- */
+html[data-theme] .pgrid{gap:14px}
+@media (min-width:720px){html[data-theme] .pgrid{gap:22px}}
+html[data-theme] .pc{background:var(--card);border:1px solid var(--card-border);border-radius:var(--r);box-shadow:var(--card-shadow,none);transition:transform .25s,box-shadow .25s}
+html[data-theme] .pc:hover{border-color:var(--card-border);box-shadow:var(--shadow);transform:translateY(-2px)}
+html[data-theme] .pc .ph{background:var(--img-bg);margin:var(--img-inset,0);border-radius:var(--img-r,0);aspect-ratio:1/1}
+html[data-theme] .pc .ph img{transition:transform .6s ease;filter:var(--img-filter,saturate(.9))}
+html[data-theme] .pc:hover .ph img{transform:scale(1.03)}
+html[data-theme] .pc .size,html[data-theme] .pc .fav{display:none}
+html[data-theme] .pc .pb{padding:14px 14px 14px;gap:5px}
+html[data-theme] .pc h3{font-family:var(--serif);font-weight:var(--name-weight);font-size:var(--name-size);line-height:1.22;letter-spacing:0;color:var(--text);text-wrap:balance}
+html[data-theme] .pc .desc{font-size:.78rem;line-height:1.45;min-height:2.9em;color:var(--muted)}
+html[data-theme] .pc .price-row{padding-top:10px;gap:6px}
+html[data-theme] .pc .price{font-family:var(--sans);font-weight:600;font-size:1.02rem;color:var(--price);text-shadow:none;letter-spacing:.01em;font-variant-numeric:lining-nums tabular-nums}
+html[data-theme] .pc .per{font-size:.74rem;color:var(--muted)}
+html[data-theme] .pc .add{margin-top:12px;min-height:38px}
+html[data-theme] .add-btn{min-height:38px;padding:6px 10px;font-size:.7rem;letter-spacing:.16em;background:var(--add-bg,transparent);color:var(--add-ink,var(--text));border:1px solid var(--add-line,var(--line-strong,var(--line)));box-shadow:none}
+html[data-theme] .add-btn:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);filter:none}
+html[data-theme] .stepper{border:1px solid var(--accent);box-shadow:none;min-height:38px;background:var(--accent-soft)}
+html[data-theme] .stepper button{color:var(--accent);font-weight:400;font-size:1.2rem}
+html[data-theme] .stepper button:active{background:var(--accent-soft)}
+html[data-theme] .stepper .q{font-weight:600;font-size:.95rem;color:var(--text)}
+html[data-theme] .badge{box-shadow:none}
+html[data-theme] .badge.off{background:none;color:var(--muted);border:1px solid var(--line);letter-spacing:.14em;font-weight:500}
+
+/* ---------- cart bar ---------- */
+html[data-theme] .cart-bar{background:var(--bar-bg,var(--card));border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 40px -12px rgba(0,0,0,.55)}
+html[data-theme] .cart-bar strong{color:var(--text);font-weight:600;font-family:var(--sans)}
+html[data-theme] .cart-bar .btn{min-height:42px}
+
+/* ---------- features (no boxes, no emoji) ---------- */
+html[data-theme] .features{margin-top:72px;gap:0 36px;border-top:1px solid var(--line)}
+html[data-theme] .features .card{background:none;border:0;border-radius:0;padding:26px 0;display:block;text-align:left}
+html[data-theme] .features .card+.card{border-top:0}
+html[data-theme] .features .big{display:none}
+html[data-theme] .features h3{color:var(--text);font-size:1.3rem;margin:0 0 6px}
+html[data-theme] .features p{color:var(--muted);font-size:.9rem}
+html[data-theme] .final-cta{margin-top:30px}
+
+/* ---------- generic cards, forms, order + contact pages ---------- */
+html[data-theme] .card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--r);box-shadow:var(--card-shadow,none)}
+html[data-theme] .card.glow{border-color:var(--line-strong,var(--line));box-shadow:var(--card-shadow,none)}
+html[data-theme] .card h2{font-size:1.5rem}
+html[data-theme] label{font-weight:500;font-size:.85rem;letter-spacing:.04em;color:var(--text)}
+html[data-theme] input,html[data-theme] select,html[data-theme] textarea{background:var(--input-bg);border:1px solid var(--line);border-radius:10px;color:var(--text)}
+html[data-theme] input:focus,html[data-theme] select:focus,html[data-theme] textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+html[data-theme] ::placeholder{color:var(--muted);opacity:.7}
+html[data-theme] input[type=checkbox],html[data-theme] .choice input{accent-color:var(--accent)}
+html[data-theme] .choice label{border:1px solid var(--line);border-radius:12px;font-size:.95rem}
+html[data-theme] .choice label:has(input:checked){border-color:var(--accent);box-shadow:none;background:var(--accent-soft)}
+html[data-theme] .oi.star{background:var(--accent-soft);border:1px solid var(--line)}
+html[data-theme] .oi-cat{font-family:var(--sans);color:var(--muted);font-size:.72rem;letter-spacing:.18em;font-weight:600}
+html[data-theme] .qty button{border:1px solid var(--line-strong,var(--line));color:var(--text);background:transparent;box-shadow:none}
+html[data-theme] .totals .grand,html[data-theme] .total td{color:var(--text);font-family:var(--serif);font-weight:var(--serif-weight)}
+html[data-theme] .mobile-bar{background:var(--hdr-bg);border-top:1px solid var(--line);box-shadow:none}
+html[data-theme] .mobile-bar .t{color:var(--text);font-weight:600}
+html[data-theme] th{color:var(--muted)}
+html[data-theme] .order-no strong{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+html[data-theme] .toast.ok{background:var(--accent-soft);color:var(--text);border-color:var(--accent)}
+html[data-theme] .hours li{border-bottom:1px solid var(--line)}
+
+/* ---------- footer + floating WhatsApp ---------- */
+html[data-theme] footer{background:var(--foot-bg,var(--bg2));border-top:1px solid var(--line);color:var(--muted);font-size:.86rem;padding:40px 0}
+html[data-theme] footer .foot-brand{font-family:var(--serif);font-weight:var(--serif-weight);color:var(--text);font-size:1.5rem!important}
+html[data-theme] footer a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)}
+html[data-theme] .wa-float{width:50px;height:50px;font-size:1.3rem;background:var(--wa-bg,var(--card));border:1px solid var(--line);box-shadow:0 10px 26px -8px rgba(0,0,0,.6)}
+
+/* ---------- mobile ---------- */
+@media (max-width:720px){
+  html[data-theme] .wrap{padding:0 20px}
+  html[data-theme] body[data-page="home"] main{padding-top:0}
+  html[data-theme] .nav{min-height:58px}
+  html[data-theme] :root,html[data-theme]{--hdr:58px}
+  html[data-theme] .logo{font-size:1.45rem}
+  html[data-theme] .hero{margin:0 -20px;border-radius:0;min-height:0}
+  html[data-theme] .hero::after{background:linear-gradient(0deg,var(--hero-fade) 8%,var(--hero-mid) 58%,rgba(0,0,0,.08) 100%)}
+  html[data-theme] .hero .content{padding:108px 22px 26px}
+  html[data-theme] .hero h1{font-size:3.1rem}
+  html[data-theme] .hero .tag{font-size:.95rem}
+  html[data-theme] .hero .cta-row .btn{flex:1;padding:11px 10px;font-size:.74rem}
+  html[data-theme] .pills{flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+  html[data-theme] .pills li{font-size:.6rem;letter-spacing:.1em}
+  html[data-theme] .pills li+li::before{margin:0 .55em}
+  html[data-theme] .section-title{margin:32px 0 6px}
+  html[data-theme] .cat-tabs{margin:0 -20px 4px}
+  html[data-theme] .tabs-inner{padding:0 20px;gap:20px}
+  html[data-theme] .pgrid{gap:12px}
+  html[data-theme] .pc .pb{padding:12px 12px 12px}
+  html[data-theme] .pc .desc{font-size:.74rem}
+  html[data-theme] .pc .price{font-size:.98rem}
+  html[data-theme] .features{grid-template-columns:1fr;margin-top:56px}
+  html[data-theme] .features .card+.card{border-top:1px solid var(--line)}
+  html[data-theme] .nav-links{padding-bottom:16px}
+  html[data-theme] .nav-links a{font-size:.95rem}
+}
+html[data-theme] body:not([data-page="home"]) main{padding-top:36px}

@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#07070b">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍦</text></svg>">
-<link rel="stylesheet" href="/css/style.css"><title>Order online</title></head>
+<link rel="stylesheet" href="/css/style.css"><script src="/js/theme.js"></script><title>Order online</title></head>
 <body data-page="order"><header class="site-header" id="site-header"></header>
 <main class="wrap" id="order-area">
   <h1 class="neon-pink" style="font-size:clamp(2rem,6vw,3rem)">Order online</h1>
-  <p class="sample-note">💵 <span id="pay-note">Cash on delivery only.</span> <span id="min-note"></span> Prices are sample prices.</p>
+  <p class="sample-note"><span class="ico">💵</span> <span id="pay-note">Cash on delivery only.</span> <span id="min-note"></span> Prices are sample prices.</p>
   <noscript><div class="toast bad">Please enable JavaScript to order online, or call us.</div></noscript>
   <form id="order-form" method="post" action="/order" novalidate>
     <div class="order-layout">
       <div>
         <section class="card"><h2 class="neon-cyan">1. Pick your ice cream</h2><div id="items"></div><span class="err" id="err-items"></span></section>
         <section class="card"><h2 class="neon-cyan">2. Delivery or pickup?</h2>
-          <div class="choice"><label><input type="radio" name="fulfilment" value="delivery" checked> 🛵 Delivery in Lahore</label>
-          <label><input type="radio" name="fulfilment" value="pickup"> 🏭 Pickup from factory</label></div><span class="err" id="err-fulfilment"></span>
+          <div class="choice"><label><input type="radio" name="fulfilment" value="delivery" checked> <span class="ico">🛵</span> Delivery in Lahore</label>
+          <label><input type="radio" name="fulfilment" value="pickup"> <span class="ico">🏭</span> Pickup from factory</label></div><span class="err" id="err-fulfilment"></span>
           <div id="address-block"><label for="address">Delivery address (Lahore)</label>
             <textarea id="address" name="address" rows="2" placeholder="House #, street, block, area, Lahore" autocomplete="street-address"></textarea><span class="err" id="err-address"></span>
             <label for="area">Area / landmark (optional)</label><input id="area" name="area" placeholder="e.g. near main market">

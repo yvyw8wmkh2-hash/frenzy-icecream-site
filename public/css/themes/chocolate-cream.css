@@ -1,0 +1,16 @@
+/* Theme 2 – Chocolate & Cream: dark chocolate, cream + caramel accents, warm and cosy. DM Serif Display + DM Sans. */
+html[data-theme="chocolate-cream"]{
+  --bg:#1e1310; --bg2:#180f0c; --card:#2a1b16; --line:rgba(243,226,200,.11); --line-strong:rgba(243,226,200,.26);
+  --text:#f5e8d3; --muted:#c3ab92; --accent:#d29b5c; --accent-ink:#22140d; --accent-soft:rgba(210,155,92,.13); --price:#ecc48f;
+  --serif:"DM Serif Display",Georgia,serif; --sans:"DM Sans",system-ui,sans-serif; --serif-weight:400; --name-size:1.08rem; --name-weight:400;
+  --img-bg:#0c0705; --hdr-bg:rgba(30,19,16,.96); --hero-fade:rgba(30,19,16,.97); --hero-mid:rgba(30,19,16,.45);
+  --r:18px; --btn-r:999px; --input-bg:#24170f; --foot-bg:#170e0b;
+  --img-inset:6px 6px 0; --img-r:13px; --card-shadow:0 12px 28px -18px rgba(0,0,0,.8);
+  --add-bg:#f3e2c8; --add-ink:#2a1b16; --add-line:#f3e2c8;
+}
+html[data-theme="chocolate-cream"] .add-btn:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme="chocolate-cream"] .btn{letter-spacing:.08em;text-transform:none;font-size:.9rem;font-weight:600}
+html[data-theme="chocolate-cream"] .btn.small{font-size:.8rem;letter-spacing:.04em}
+html[data-theme="chocolate-cream"] .add-btn{font-size:.82rem;letter-spacing:.04em;text-transform:none}
+html[data-theme="chocolate-cream"] .cat-tabs a{text-transform:none;letter-spacing:.02em;font-size:.9rem}
+html[data-theme="chocolate-cream"] .cart-bar,html[data-theme="chocolate-cream"] .wa-float{background:#2f1f19}
