@@ -194,7 +194,7 @@ function cleanConfig(input, old) {
   return {
     _README: old._README,
     brand: { name: t(b.name, 60, 'Business name'), tagline: t(b.tagline, 200), urduTagline: t(b.urduTagline, 120), intro: t(b.intro, 1000),
-      heroImage: img(b.heroImage) || '/images/hero.jpg', imagesNote: t(b.imagesNote, 200) },
+      heroImage: img(b.heroImage) || '/images/hero-tubs.webp', imagesNote: t(b.imagesNote, 200) },
     contact: { address: t(c.address, 300), phone: t(c.phone, 30), whatsapp: t(c.whatsapp, 30), email: t(c.email, 120), mapUrl: /^https?:\/\//.test(c.mapUrl || '') ? t(c.mapUrl, 500) : '',
       hours: (Array.isArray(c.hours) ? c.hours : []).slice(0, 14).map(h => ({ days: t(h.days, 60), time: t(h.time, 80) })).filter(h => h.days || h.time) },
     ordering: { currency: t(o.currency, 8) || 'Rs', deliveryFee: num(o.deliveryFee ?? 0, 'Delivery fee'), freeDeliveryOver: num(o.freeDeliveryOver ?? 0, 'Free delivery threshold'),

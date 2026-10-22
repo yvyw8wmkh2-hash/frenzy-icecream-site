@@ -73,8 +73,21 @@ function addTubsAndLollies(cfg) {
   return changes;
 }
 
+// Noir & Gold hero: swap the original cones photo for the 1 L chocolate + strawberry tubs shot,
+// but only if the hero is still the seed photo (or empty). An admin-uploaded/custom hero is left alone.
+const OLD_HEROES = new Set(['', '/images/hero.jpg']);
+const NEW_HERO = '/images/hero-tubs.webp';
+function noirGoldHero(cfg) {
+  cfg.brand = cfg.brand || {};
+  const cur = cfg.brand.heroImage == null ? '' : String(cfg.brand.heroImage).trim();
+  if (!OLD_HEROES.has(cur)) return [];
+  cfg.brand.heroImage = NEW_HERO;
+  return ['brand.heroImage -> ' + NEW_HERO];
+}
+
 const MIGRATIONS = [
-  { id: '2026-10-22-tubs-and-lollies', up: addTubsAndLollies }
+  { id: '2026-10-22-tubs-and-lollies', up: addTubsAndLollies },
+  { id: '2026-10-22-noir-gold-hero', up: noirGoldHero }
 ];
 
 // Applies every migration whose id is not in `applied`. Returns { config, ran: [ids], changes: [..] }.
@@ -89,7 +102,7 @@ function applyMigrations(config, applied = new Set()) {
   return { config: cfg, ran, changes };
 }
 
-module.exports = { MIGRATIONS, applyMigrations };
+module.exports = { MIGRATIONS, applyMigrations, NEW_HERO };
 
 if (require.main === module) {          // node migrations.js data/config.json  -> rewrites the file in place
   const fs = require('fs');

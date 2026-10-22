@@ -106,7 +106,7 @@
   const pages = {
     home() {
       const b = CFG.brand, o = CFG.ordering;
-      $('#hero').innerHTML = `<img class="bg" src="${esc(b.heroImage || '/images/hero.jpg')}" alt="" fetchpriority="high">
+      $('#hero').innerHTML = `<img class="bg" src="${esc(b.heroImage || '/images/hero-tubs.webp')}" alt="" fetchpriority="high">
         <div class="content"><h1 class="neon-pink">${esc(b.name)}</h1>
         ${b.urduTagline ? `<div class="urdu">${esc(b.urduTagline)}</div>` : ''}
         <p class="tag">${esc(b.tagline)}</p>
