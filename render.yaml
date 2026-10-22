@@ -1,0 +1,20 @@
+# Render Blueprint – free web service. Data is kept in an external free Postgres (Neon) via DATABASE_URL,
+# because the free instance's disk is wiped on every restart/redeploy.
+services:
+  - type: web
+    name: frenzy-icecream
+    runtime: node
+    plan: free
+    region: singapore          # closest Render region to Lahore; create the Neon DB in AWS ap-southeast-1 (Singapore) too
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false            # entered in the Render dashboard, never committed
+      - key: DATABASE_URL
+        sync: false            # Neon connection string, entered in the Render dashboard

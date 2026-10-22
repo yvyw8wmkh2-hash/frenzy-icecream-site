@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin · Frenzy</title><link rel="stylesheet" href="/css/style.css">
+<style>
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}.tabs button{background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:700;font-size:1rem;cursor:pointer}
+.tabs button.on{border-color:var(--pink);color:#fff;box-shadow:0 0 12px rgba(255,43,214,.45)}
+.tab{display:none}.tab.on{display:block}
+.savebar{position:sticky;top:66px;z-index:15;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:rgba(20,20,31,.96);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin:12px 0}
+.savebar.dirty{border-color:var(--mango);box-shadow:0 0 14px rgba(255,182,39,.35)}
+.flav{display:grid;grid-template-columns:110px 1fr;gap:14px;border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;background:#0f0f18}
+.flav img{width:110px;height:110px;object-fit:cover;border-radius:12px;background:#000}
+.flav .f{display:grid;grid-template-columns:2fr 1fr 1fr;gap:0 10px}.flav .f .full{grid-column:1/-1}
+.flav label{margin:6px 0 3px;font-size:.85rem}.flav input,.flav textarea,.flav select{min-height:40px;padding:8px 10px}
+.toggles{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.toggles label{display:flex;gap:8px;align-items:center;margin:0;font-size:.95rem}
+.flav .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.cat{border:1px solid rgba(25,240,255,.35);border-radius:20px;padding:14px;margin:18px 0}
+.cat-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cat-head input{flex:1;font-weight:800;font-size:1.1rem}
+.ord{border:1px solid var(--line);border-left:5px solid var(--pink);border-radius:14px;padding:14px;margin:10px 0;background:#0f0f18}
+.ord[data-s=confirmed]{border-left-color:var(--cyan)}.ord[data-s=out-for-delivery]{border-left-color:var(--mango)}.ord[data-s=completed]{border-left-color:var(--lime);opacity:.8}.ord[data-s=cancelled]{border-left-color:#555;opacity:.6}
+.ord .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.ord select{width:auto;min-height:38px;padding:6px 10px}
+.msg.unread{border-left-color:var(--cyan)}.msg{border-left-color:#444}
+.hrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:6px 0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filters select,.filters input{width:auto;min-height:40px;padding:6px 10px}
+@media(max-width:720px){.flav{grid-template-columns:1fr}.flav img{width:100%;height:180px}.flav .f{grid-template-columns:1fr 1fr}.flav .f .nm{grid-column:1/-1}.hrow{grid-template-columns:1fr}.savebar{top:0}}
+</style></head>
+<body>
+<header class="site-header"><div class="wrap nav"><a class="logo" href="/" target="_blank">Frenzy<small>ADMIN · CONTENT MANAGER</small></a>
+<a class="btn small ghost" href="/" target="_blank">View site ↗</a></div></header>
+<main class="wrap">
+  <div class="tabs" role="tablist">
+    <button data-tab="orders" class="on">📦 Orders <span id="n-orders" class="badge new"></span></button>
+    <button data-tab="messages">✉️ Messages <span id="n-msgs" class="badge new"></span></button>
+    <button data-tab="menu">🍦 Flavours & prices</button>
+    <button data-tab="business">🏪 Business info</button>
+    <button data-tab="photos">🖼️ Home photo</button>
+  </div>
+  <div id="flash"></div>
+
+  <section class="tab on" id="tab-orders">
+    <div class="filters"><label style="margin:0">Show</label><select id="o-filter"><option value="open">Open orders</option><option value="all">All orders</option>
+      <option value="new">New</option><option value="confirmed">Confirmed</option><option value="out-for-delivery">Out for delivery</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+      <button class="btn small ghost" id="refresh">↻ Refresh</button><a class="btn small ghost" href="/admin/orders.json" download>Download all (JSON)</a></div>
+    <div id="orders"></div>
+  </section>
+
+  <section class="tab" id="tab-messages"><div id="messages"></div></section>
+
+  <section class="tab" id="tab-menu">
+    <p class="sample-note">Edit flavours below, then press <b>Save changes</b>. ★ Featured = big "Fan favourite" card on Home & Menu. Untick "Sample price" once a price is real. Photos save straight away.</p>
+    <div class="savebar" id="savebar-menu"><span class="state">All changes saved</span><span><button class="btn small ghost" data-act="add-cat">+ Add category</button> <button class="btn small lime save">💾 Save changes</button></span></div>
+    <div id="menu-editor"></div>
+  </section>
+
+  <section class="tab" id="tab-business">
+    <div class="savebar" id="savebar-biz"><span class="state">All changes saved</span><button class="btn small lime save">💾 Save changes</button></div>
+    <div class="card"><h2 class="neon-pink">Brand</h2><div class="form-grid">
+      <div><label>Business name</label><input data-k="brand.name"></div><div><label>Tagline</label><input data-k="brand.tagline"></div>
+      <div><label>Urdu tagline (optional)</label><input data-k="brand.urduTagline" dir="rtl"></div><div><label>Photo note (footer)</label><input data-k="brand.imagesNote"></div>
+      <div class="full"><label>Intro text (Home page)</label><textarea data-k="brand.intro" rows="3"></textarea></div></div></div>
+    <div class="card"><h2 class="neon-pink">Contact</h2><div class="form-grid">
+      <div><label>Phone</label><input data-k="contact.phone" type="tel"></div><div><label>WhatsApp (leave empty to hide button)</label><input data-k="contact.whatsapp" type="tel"></div>
+      <div><label>Email</label><input data-k="contact.email" type="email"></div><div><label>Google Maps link (optional)</label><input data-k="contact.mapUrl" placeholder="https://maps.google.com/…"></div>
+      <div class="full"><label>Address</label><textarea data-k="contact.address" rows="2"></textarea></div></div>
+      <h3 class="neon-cyan" style="margin-top:18px">Opening hours</h3><div id="hours-editor"></div><button class="btn small ghost" id="add-hours">+ Add row</button></div>
+    <div class="card"><h2 class="neon-pink">Ordering & delivery (Rs)</h2><div class="form-grid">
+      <div><label>Delivery fee</label><input data-k="ordering.deliveryFee" type="number" min="0"></div><div><label>Free delivery over (0 = never)</label><input data-k="ordering.freeDeliveryOver" type="number" min="0"></div>
+      <div><label>Minimum order</label><input data-k="ordering.minimumOrder" type="number" min="0"></div><div><label>Max quantity per item</label><input data-k="ordering.maxQtyPerItem" type="number" min="1"></div>
+      <div><label>How many days ahead can people order</label><input data-k="ordering.maxDaysAhead" type="number" min="0"></div><div><label>Currency label</label><input data-k="ordering.currency"></div>
+      <div class="full"><label>Payment note</label><input data-k="ordering.paymentNote"></div><div class="full"><label>Delivery area note</label><textarea data-k="ordering.deliveryAreaNote" rows="2"></textarea></div></div></div>
+  </section>
+
+  <section class="tab" id="tab-photos">
+    <div class="card"><h2 class="neon-pink">Home page hero photo</h2><p>Wide photos (landscape) look best. It's resized automatically and saved straight away.</p>
+      <img id="hero-prev" style="width:100%;max-height:380px;object-fit:cover;border-radius:16px;border:1px solid var(--line)" alt="">
+      <div class="cta-row"><label class="btn" style="margin:0">📷 Upload new hero photo<input type="file" accept="image/*" id="hero-file" hidden></label></div></div>
+    <p class="sample-note">Flavour photos are changed in the <b>Flavours & prices</b> tab ("Change photo" on each flavour).</p>
+  </section>
+</main>
+<script src="/admin/admin.js"></script></body></html>

@@ -1,0 +1,229 @@
+{
+  "_README": "Edited automatically by the /admin content manager (recommended), or by hand. Items/prices marked SAMPLE are placeholders. 'bestseller': true = large 'Fan favourites' card. 'samplePrice': true shows a 'sample price' badge; switch it off once the price is real. Prices in PKR (Rs).",
+  "brand": {
+    "name": "Frenzy",
+    "tagline": "Lahore's favourite ice cream (sample tagline)",
+    "urduTagline": "ٹھنڈا ٹھنڈا، میٹھا میٹھا",
+    "intro": "Frenzy makes ice cream right here in Lahore. Our fans' favourites are rich Chocolate and juicy Mango. (Placeholder intro text: change it in the admin page.)",
+    "heroImage": "/images/hero.jpg",
+    "imagesNote": "All photos are AI-generated placeholders. Replace them from /admin."
+  },
+  "contact": {
+    "address": "[Placeholder] Street address, Area, Lahore, Punjab, Pakistan",
+    "phone": "+92 300 0000000",
+    "whatsapp": "+92 300 0000000",
+    "email": "orders@example.com",
+    "mapUrl": "",
+    "hours": [
+      {
+        "days": "Monday – Thursday",
+        "time": "12:00 PM – 11:00 PM (sample)"
+      },
+      {
+        "days": "Friday",
+        "time": "2:30 PM – 11:30 PM (sample)"
+      },
+      {
+        "days": "Saturday – Sunday",
+        "time": "12:00 PM – 12:00 AM (sample)"
+      }
+    ]
+  },
+  "ordering": {
+    "currency": "Rs",
+    "deliveryFee": 150,
+    "freeDeliveryOver": 3000,
+    "minimumOrder": 500,
+    "maxQtyPerItem": 50,
+    "maxDaysAhead": 30,
+    "paymentNote": "Cash on delivery / cash on pickup only.",
+    "deliveryAreaNote": "Delivery within Lahore only (sample note – list your areas here)."
+  },
+  "menu": [
+    {
+      "category": "Scoops & Cups",
+      "items": [
+        {
+          "id": "chocolate-cup",
+          "name": "Chocolate",
+          "description": "Rich, dark, chocolatey: our most-loved flavour.",
+          "unit": "cup",
+          "price": 300,
+          "available": true,
+          "bestseller": true,
+          "samplePrice": true,
+          "image": "/images/chocolate.jpg"
+        },
+        {
+          "id": "mango-cup",
+          "name": "Mango",
+          "description": "Made with Pakistani mangoes: sweet, fresh and fruity.",
+          "unit": "cup",
+          "price": 320,
+          "available": true,
+          "bestseller": true,
+          "samplePrice": true,
+          "image": "/images/mango.jpg"
+        },
+        {
+          "id": "vanilla-cup",
+          "name": "Classic Vanilla (sample)",
+          "description": "Creamy vanilla bean, single cup.",
+          "unit": "cup",
+          "price": 250,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/vanilla.jpg"
+        },
+        {
+          "id": "pistachio-cup",
+          "name": "Pistachio (sample)",
+          "description": "Roasted pista with real nuts.",
+          "unit": "cup",
+          "price": 320,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/pistachio.jpg"
+        },
+        {
+          "id": "strawberry-cup",
+          "name": "Strawberry Swirl (sample)",
+          "description": "Strawberry ripple in sweet cream.",
+          "unit": "cup",
+          "price": 260,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/strawberry.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Kulfi & Desi Favourites",
+      "items": [
+        {
+          "id": "malai-kulfi",
+          "name": "Malai Kulfi (sample)",
+          "description": "Traditional slow-cooked milk kulfi on a stick.",
+          "unit": "piece",
+          "price": 150,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/kulfi.jpg"
+        },
+        {
+          "id": "pista-kulfi",
+          "name": "Pista Badam Kulfi (sample)",
+          "description": "Kulfi with pistachio and almond.",
+          "unit": "piece",
+          "price": 180,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/kulfi.jpg"
+        },
+        {
+          "id": "kheer-ice-cream",
+          "name": "Kheer Ice Cream (sample)",
+          "description": "Rice pudding inspired flavour with cardamom.",
+          "unit": "cup",
+          "price": 290,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/vanilla.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Family Tubs (1 Litre)",
+      "items": [
+        {
+          "id": "vanilla-tub",
+          "name": "Vanilla Tub (sample)",
+          "description": "1 litre family pack.",
+          "unit": "1L tub",
+          "price": 950,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/tub.jpg"
+        },
+        {
+          "id": "chocolate-tub",
+          "name": "Chocolate Tub",
+          "description": "1 litre family pack.",
+          "unit": "1L tub",
+          "price": 1050,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/chocolate.jpg"
+        },
+        {
+          "id": "mango-tub",
+          "name": "Mango Tub",
+          "description": "1 litre family pack, seasonal.",
+          "unit": "1L tub",
+          "price": 1100,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/mango.jpg"
+        },
+        {
+          "id": "tutti-frutti-tub",
+          "name": "Tutti Frutti Tub (sample)",
+          "description": "1 litre, colourful candied fruit.",
+          "unit": "1L tub",
+          "price": 1000,
+          "available": false,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/tub.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Sundaes & Shakes",
+      "items": [
+        {
+          "id": "brownie-sundae",
+          "name": "Brownie Sundae (sample)",
+          "description": "Warm brownie, two scoops, fudge sauce.",
+          "unit": "sundae",
+          "price": 550,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/sundae.jpg"
+        },
+        {
+          "id": "falooda",
+          "name": "Falooda (sample)",
+          "description": "Rose syrup, vermicelli, basil seeds and kulfi.",
+          "unit": "glass",
+          "price": 450,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/falooda.jpg"
+        },
+        {
+          "id": "oreo-shake",
+          "name": "Oreo Shake (sample)",
+          "description": "Thick shake blended with cookies.",
+          "unit": "glass",
+          "price": 480,
+          "available": true,
+          "bestseller": false,
+          "samplePrice": true,
+          "image": "/images/shake.jpg"
+        }
+      ]
+    }
+  ]
+}

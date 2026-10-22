@@ -1,0 +1,18 @@
+{
+  "name": "frenzy-icecream-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frenzy ice cream factory website (Lahore) – plain Node server with optional Postgres storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/smoke.js"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

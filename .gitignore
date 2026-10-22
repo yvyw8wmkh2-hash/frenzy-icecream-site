@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# secrets – never commit
+.env
+.env.*
+!.env.example
+
+# logs / runtime
+logs/
+*.log
+*.tmp
+
+# local runtime data (in production these live in Postgres)
+data/orders.json
+data/messages.json
+data/backups/
+
+# admin photo uploads (file mode only; in production they are stored in Postgres)
+public/images/uploads/
+uploads/
+
+# OS / editor
+.DS_Store
